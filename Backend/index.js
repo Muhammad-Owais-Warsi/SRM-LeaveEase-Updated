@@ -13,7 +13,7 @@ const primary_mail_pass = process.env.MAIL_PASSWORD;
 const port = 3000;
 const app = express();
 
-mongoose.connect("mongodb://127.0.0.1:27017/LeaveEase");
+mongoose.connect(process.env.MONGO_URL);
 
 app.use(express.urlencoded({ extended: false }));
 app.use(cors());
