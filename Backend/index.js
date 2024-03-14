@@ -13,7 +13,9 @@ const primary_mail_pass = process.env.MAIL_PASSWORD;
 const port = 3000;
 const app = express();
 
-mongoose.connect(process.env.MONGO_URL);
+mongoose.connect(process.env.MONGO_URL, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true});
 
 app.use(express.urlencoded({ extended: false }));
 app.use(cors());
@@ -30,7 +32,7 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
-});
+}, { collection: 'users' });
 
 const faSchema = new mongoose.Schema({
   name: {
@@ -87,7 +89,7 @@ const faSchema = new mongoose.Schema({
       required: true,
     },
   },
-});
+},{ collection: 'fas' });
 
 const hcoordSchema = new mongoose.Schema({
   name: {
@@ -144,7 +146,7 @@ const hcoordSchema = new mongoose.Schema({
       required: true,
     },
   },
-});
+},{ collection: 'hods' });
 
 const hodSchema = new mongoose.Schema({
   name: {
@@ -201,7 +203,7 @@ const hodSchema = new mongoose.Schema({
       required: true,
     },
   },
-});
+},{ collection: 'hcoords' });
 
 const User = mongoose.model("User", userSchema);
 const Fa = mongoose.model("Fa", faSchema);
@@ -247,16 +249,18 @@ app.post("/user/login", async (req, res) => {
 
     if (duplicateUser || duplicateHodUser || duplicateFaUser) {
       res.status(400).json({ message: "error found" });
-    } else if (duplicateUser && (!duplicateFaUser || !duplicateHodUser)) {
-      const userDelete = await User.deleteOne({ email });
-      const newUser = await User.create({
+    } 
+    else if (duplicateUser && (!duplicateFaUser || !duplicateHodUser)) {
+      await User.deleteOne({ email });
+      await User.create({
         email: email,
         register: register,
       });
+     
 
       res.status(200).json({ message: newUser });
     } else {
-      const newUser = await User.create({
+      await User.create({
         email: email,
         register: register,
       });
